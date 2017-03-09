@@ -17,8 +17,8 @@ np.random.seed(1337)
 import time
 
 #Data loading 
-X_train = np.load('videopart43.npy')
-Y_train = np.load('audiopart43.npy')
+X_train = np.load('../data/videopart43.npy')
+Y_train = np.load('../data/audiopart43.npy')
 
 #Reshaping to the 'th' order to feed into the cnn
 X_train = X_train.reshape((X_train.shape[0],1,53,53)).astype('float32')
@@ -105,7 +105,7 @@ seq.compile(loss='mse', optimizer='rmsprop',metrics=['accuracy'])
 from keras.callbacks import ModelCheckpoint
 from os.path import isfile, join
 #weight file name
-weight_file = 'dlcnn_weights.h5'
+weight_file = '../weights/dlcnn_weights.h5'
 
 #loading previous weight file for resuming training 
 if isfile(weight_file):
@@ -126,4 +126,4 @@ pred = seq.predict(X_train,batch_size=batchSize,verbose=1)
 pred = pred*32767
 print('pred shape',pred.shape)
 print('pred dtype',pred.dtype)
-np.save('pred-dlcnn.npy',pred)
+np.save('../predictions/pred-dlcnn.npy',pred)

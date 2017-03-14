@@ -34,31 +34,28 @@ model_time = time.time()
 model = Sequential()
 
 model.add(TimeDistributed(Convolution2D(64, 3, 3,border_mode='valid'),batch_input_shape=(14,13,1,53,53),input_shape=(13,1,53,53)))
-model.add(Activation('sigmoid'))
+model.add(Activation('tanh'))
 model.add(Dropout(0.25))
 
 model.add(TimeDistributed(Convolution2D(32, 2, 2, border_mode='valid')))
-model.add(Activation('sigmoid'))
+model.add(Activation('tanh'))
 
 
 model.add(TimeDistributed(Flatten()))
 
 model.add(Bidirectional(LSTM(256,return_sequences=True,stateful=True)))
-model.add(Activation('sigmoid'))
-
+model.add(Dropout(0.20))
 model.add(Bidirectional(LSTM(128,return_sequences=True,stateful=True)))
-model.add(Activation('sigmoid'))
-
+model.add(Dropout(0.20))
 model.add((LSTM(64,stateful=True)))
-model.add(Activation('sigmoid'))
 model.add(Dropout(0.20))
 
 model.add((Dense(512)))
-model.add(Activation('sigmoid'))
+model.add(Activation('tanh'))
 model.add(Dropout(0.5))
 
 model.add((Dense(13*4702)))
-model.add(Activation('sigmoid'))
+model.add(Activation('tanh'))
 
 model.compile(loss='mse', optimizer='rmsprop', metrics=['accuracy'])
 
@@ -66,7 +63,7 @@ model.compile(loss='mse', optimizer='rmsprop', metrics=['accuracy'])
 from keras.callbacks import ModelCheckpoint
 from os.path import isfile, join
 #weight file name
-weight_file = '../weights/time-cnn_weight.h5'
+weight_file = '../weights/time-dis-cnn_weight.h5'
 
 #loading previous weight file for resuming training 
 if isfile(weight_file):
@@ -85,7 +82,7 @@ model.fit(X_train,Y_train, nb_epoch=1, batch_size=14,callbacks=callbacks_list)
 pred = model.predict(X_train,batch_size=14,verbose=1)
 
 pred = pred*32767
-pred = pred*reshape(826*13,4702)
+pred = pred.reshape(826*13,4702)
 print('pred shape',pred.shape)
 print('pred dtype',pred.dtype)
 np.save('../predictions/pred-time-cnn.npy',pred)

@@ -12,8 +12,8 @@ np.random.seed(1337)
 #random seed fixing for reproducibility
 
 #data load & preprocessing 
-X_train = np.load('videopart43.npy').astype('float32')
-Y_train = np.load('audiopart43.npy').astype('float32')
+X_train = np.load('../data/videopart43.npy').astype('float32')
+Y_train = np.load('../data/audiopart43.npy').astype('float32')
 
 X_train = X_train.reshape(826,13,53*53).astype('float32')
 Y_train = Y_train.reshape(826,13*4702).astype('float32')
@@ -35,22 +35,19 @@ model = Sequential()
 
 #1st lstm layer
 model.add(Bidirectional(LSTM(512,return_sequences=True,stateful=True),batch_input_shape=(14,13,2809),input_shape=(13,2809)))
-model.add(Activation('sigmoid'))
 model.add(Dropout(0.25))
 
 #2nd lstm layer
 model.add(Bidirectional(LSTM(256,return_sequences=True,stateful=True)))
-model.add(Activation('tanh'))
 model.add(Dropout(0.25))
 
 #2nd lstm layer
 model.add(Bidirectional(LSTM(128,stateful=True)))
-model.add(Activation('sigmoid'))
 model.add(Dropout(0.5))
 
 #final dense layer
 model.add(Dense(13*4702))
-model.add(Activation('tanh'))
+model.add(Activation('sigmoid'))
 
 
 model.compile(loss='mse', optimizer='rmsprop',metrics=['accuracy'])
@@ -59,7 +56,7 @@ model.compile(loss='mse', optimizer='rmsprop',metrics=['accuracy'])
 from keras.callbacks import ModelCheckpoint
 from os.path import isfile, join
 #weight file name
-weight_file = 'bidirectional-lstm_weight-v2.h5'
+weight_file = '../weights/bidirectional-lstm_weight-v2.h5'
 
 #loading previous weight file for resuming training 
 if isfile(weight_file):
@@ -79,4 +76,4 @@ pred = model.predict(X_train,batch_size=14,verbose=1)
 
 print('pred shape',pred.shape)
 print('pred dtype',pred.dtype)
-np.save('pred-lstm-bidirectional.npy',pred)
+np.save('../predictions/pred-lstm-bidirectional.npy',pred)

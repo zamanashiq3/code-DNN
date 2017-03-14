@@ -35,17 +35,14 @@ model = Sequential()
 
 #1st lstm layer
 model.add(LSTM(512,input_shape=(13,53*53),batch_input_shape= 		(14,13,2809),return_sequences=True,stateful=True))
-model.add(Activation('sigmoid'))
 model.add(Dropout(0.25))
 
 #2nd lstm layer
 model.add(LSTM(256,return_sequences=True,stateful=True))
-model.add(Activation('tanh'))
 model.add(Dropout(0.25))
 
 #2nd lstm layer
 model.add(LSTM(128,stateful=True))
-model.add(Activation('sigmoid'))
 model.add(Dropout(0.5))
 
 #final dense layer
@@ -77,6 +74,7 @@ model.fit(X_train,Y_train, nb_epoch=10, batch_size=14,callbacks=callbacks_list)
 
 pred = model.predict(X_train,batch_size=14,verbose=1)
 
+pred = pred*reshape(826*13,4702)
 print('pred shape',pred.shape)
 print('pred dtype',pred.dtype)
-np.save('pred-lstm-v2.npy',pred)
+np.save('../predictions/pred-lstm-v2.npy',pred)

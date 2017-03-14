@@ -70,19 +70,17 @@ seq.add(Flatten())
 
 #reshapeing and permute to feed the data into a lstm network
 
-seq.add(Reshape((16,1080)))
+seq.add(Reshape((1080,16)))
 seq.add(Permute((2,1)))
 
 #1st lstm layer
 
 seq.add(LSTM(64,return_sequences=True,stateful=True))
-seq.add(Activation('sigmoid'))
 seq.add(Dropout(0.25))
 
 #2nd lstm layer
 
 seq.add(LSTM(32,stateful=True))
-seq.add(Activation('sigmoid'))
 seq.add(Dropout(0.25))
 
 #a pre lc layer
@@ -104,7 +102,7 @@ seq.compile(loss='mse', optimizer='rmsprop',metrics=['accuracy'])
 from keras.callbacks import ModelCheckpoint
 from os.path import isfile, join
 #weight file name
-weight_file = '../weights/dlcnn_weights.h5'
+weight_file = '../weights/dlcnn-new_weights.h5'
 
 #loading previous weight file for resuming training 
 if isfile(weight_file):
@@ -125,4 +123,4 @@ pred = seq.predict(X_train,batch_size=batchSize,verbose=1)
 pred = pred.reshape(10738,4702)
 print('pred shape',pred.shape)
 print('pred dtype',pred.dtype)
-np.save('../predictions/pred-dlcnn.npy',pred)
+np.save('../predictions/pred-dlcnn-new.npy',pred)
